@@ -1,13 +1,131 @@
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #e8f3ff;
+  background: linear-gradient(180deg, #87ceeb 0%, #b4e0fd 100%);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-cloud-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.app-cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50px;
+  filter: blur(20px);
+}
+
+.app-cloud::before,
+.app-cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.app-cloud-1 {
+  width: 200px;
+  height: 60px;
+  top: 15%;
+  right: -100px;
+  animation: floatAppCloud 30s linear infinite;
+}
+
+.app-cloud-1::before {
+  width: 70px;
+  height: 70px;
+  top: -40px;
+  left: 30px;
+}
+
+.app-cloud-1::after {
+  width: 90px;
+  height: 90px;
+  top: -50px;
+  left: 70px;
+}
+
+.app-cloud-2 {
+  width: 120px;
+  height: 40px;
+  top: 45%;
+  left: -60px;
+  animation: floatAppCloud 25s linear infinite reverse;
+}
+
+.app-cloud-2::before {
+  width: 50px;
+  height: 50px;
+  top: -30px;
+  left: 20px;
+}
+
+.app-cloud-2::after {
+  width: 60px;
+  height: 60px;
+  top: -36px;
+  left: 50px;
+}
+
+.app-cloud-3 {
+  width: 160px;
+  height: 50px;
+  bottom: 25%;
+  left: -80px;
+  animation: floatAppCloud 35s linear infinite;
+}
+
+.app-cloud-3::before {
+  width: 60px;
+  height: 60px;
+  top: -36px;
+  left: 24px;
+}
+
+.app-cloud-3::after {
+  width: 70px;
+  height: 70px;
+  top: -40px;
+  left: 60px;
+}
+
+@keyframes floatAppCloud {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 300px));
+  }
 }
 
 *, *:before, *:after {
@@ -15,16 +133,90 @@ body {
 }
 
 .weather-container {
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   padding: clamp(15px, 3vw, 30px);
   border-radius: 25px;
   width: 100%;
   max-width: 33vw;
-  min-width: 700px;
+  min-width: 900px;
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.weather-content {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.forecast-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.forecast-day {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.forecast-day:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateX(-5px);
+}
+
+.forecast-date {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.forecast-temp {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.forecast-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #4a90e2;
+  background: rgba(74, 144, 226, 0.1);
+  border-radius: 50%;
+  padding: 8px;
+}
+
+.weather-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.forecast-day:hover .weather-icon {
+  transform: scale(1.1);
+}
+
+.forecast-weather {
+  color: #4a90e2;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 @media (min-width: 768px) {
@@ -34,7 +226,9 @@ body {
 }
 
 .main-weather {
-  background: linear-gradient(180deg, #87ceeb 0%, #b4e0fd 100%);
+  background: #b0ddf7;
+  /* background: rgba(255, 255, 255, 0.1); */
+  backdrop-filter: blur(10px);
   padding: clamp(15px, 2vw, 25px);
   border-radius: 20px;
   display: flex;
@@ -44,9 +238,10 @@ body {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  min-height: 200px;
+  min-height: 240px;
   justify-content: space-between;
   width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .cloud-bg {
@@ -207,7 +402,7 @@ body {
   background: rgba(255, 255, 255, 0.1);
   padding: 4px;
   border-radius: 25px;
-  width: 200px;
+  width: 220px;
   justify-content: center;
 }
 
@@ -274,6 +469,7 @@ body {
   line-height: 1;
   margin: 0;
   text-align: center;
+  margin-top: .2em;
 }
 
 .weather-description {
@@ -303,6 +499,7 @@ body {
   .weather-container {
     min-width: unset;
     max-width: 100%;
+    grid-template-columns: 1fr;
   }
   
   .stats-grid {
@@ -360,6 +557,14 @@ body {
   position: relative;
   border: 2px solid #e0e7ff;
   border-radius: 50%;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.compass:hover {
+  transform: scale(1.05);
+  border-color: rgba(74, 144, 226, 0.5);
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
 }
 
 .compass-arrow {
@@ -370,6 +575,14 @@ body {
   height: calc(50% - 5px);
   background: #4a90e2;
   transform-origin: bottom center;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 1px rgba(74, 144, 226, 0));
+}
+
+.compass:hover .compass-arrow {
+  width: 4px;
+  background: #4a90e2;
+  filter: drop-shadow(0 0 3px rgba(74, 144, 226, 0.6));
 }
 
 .compass-labels {
@@ -382,6 +595,12 @@ body {
   position: absolute;
   font-size: clamp(0.7rem, 1.2vw, 0.8rem);
   color: #7f8c8d;
+  transition: all 0.3s ease;
+}
+
+.compass:hover .compass-label {
+  color: #4a90e2;
+  font-weight: 500;
 }
 
 .compass-label.n { top: 5px; left: 50%; transform: translateX(-50%); }
@@ -394,6 +613,11 @@ body {
   height: clamp(100px, 15vw, 120px);
   margin: 20px auto;
   position: relative;
+  transition: transform 0.2s ease;
+}
+
+.gauge:hover {
+  transform: scale(1.05);
 }
 
 .gauge-circle {
@@ -409,7 +633,13 @@ body {
   stroke-linecap: round;
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
-  transition: stroke-dashoffset 0.3s;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 2px rgba(74, 144, 226, 0));
+}
+
+.gauge:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(74, 144, 226, 0.5));
+  stroke-width: 10;
 }
 
 .gauge-text {
@@ -427,6 +657,13 @@ body {
 
 .uv-gauge .gauge-progress {
   stroke: url(#uv-gradient);
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0));
+}
+
+.uv-gauge:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+  stroke-width: 10;
 }
 
 .uv-gauge.low .gauge-progress {
@@ -473,6 +710,26 @@ body {
   fill: #B567A4;
 }
 
+.uv-gauge.low:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(62, 167, 45, 0.5));
+}
+
+.uv-gauge.moderate:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(255, 243, 0, 0.5));
+}
+
+.uv-gauge.high:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(241, 139, 0, 0.5));
+}
+
+.uv-gauge.very-high:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(229, 50, 16, 0.5));
+}
+
+.uv-gauge.extreme:hover .gauge-progress {
+  filter: drop-shadow(0 0 4px rgba(181, 103, 164, 0.5));
+}
+
 @media (max-width: 360px) {
   body {
     padding: 10px;
@@ -493,4 +750,65 @@ body {
   .stat-card {
     padding: 15px;
   }
+}
+
+.week-summary {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px dashed rgba(74, 144, 226, 0.2);
+}
+
+.week-summary h4 {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.week-summary p {
+  color: #4a90e2;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 400;
+  background: rgba(74, 144, 226, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.week-summary p:hover {
+  background: rgba(74, 144, 226, 0.15);
+  transform: translateY(-2px);
+}
+
+.outfit-suggestions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px dashed rgba(74, 144, 226, 0.2);
+}
+
+.outfit-suggestions h4 {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.outfit-suggestions p {
+  color: #4a90e2;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 400;
+  background: rgba(74, 144, 226, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.outfit-suggestions p:hover {
+  background: rgba(74, 144, 226, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
 }

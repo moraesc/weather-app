@@ -812,3 +812,64 @@ body::before {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
 }
+
+/* Rainy theme styles */
+body.rainy-theme {
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+}
+
+.rainy-theme .weather-container {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.rainy-theme .main-weather {
+  background: #34495e;
+  color: #fff;
+}
+
+.rainy-theme .temperature-display,
+.rainy-theme .city-name,
+.rainy-theme .nav-arrow {
+  color: #fff;
+}
+
+.rainy-theme .weather-description,
+.rainy-theme .current-time,
+.rainy-theme .weather-stats {
+  color: #b8c2cc;
+}
+
+.rain-container {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.rain-drop {
+  position: absolute;
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.4));
+  animation: rain linear infinite;
+}
+
+@keyframes rain {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}

@@ -56,6 +56,31 @@ const WeatherIcon: React.FC<{ type: string }> = ({ type }) => {
   );
 };
 
+const RainEffect: React.FC = () => {
+  const raindrops = Array.from({ length: 100 }).map((_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}%`,
+    animationDuration: `${Math.random() * 0.5 + 0.7}s`,
+    animationDelay: `${Math.random() * 2}s`
+  }));
+
+  return (
+    <div className="rain-container">
+      {raindrops.map(drop => (
+        <div
+          key={drop.id}
+          className="rain-drop"
+          style={{
+            left: drop.left,
+            animationDuration: drop.animationDuration,
+            animationDelay: drop.animationDelay
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [weatherData, setWeatherData] = useState<any[]>([]);
   const [forecastData, setForecastData] = useState<ForecastData[]>([]);
@@ -92,6 +117,12 @@ const App: React.FC = () => {
         // Process forecast data
         const processedForecast = processForecastData(forecastResponse.data.list);
         setForecastData(processedForecast);
+
+        // After setting weather data, update body class
+        if (responses.length > 0) {
+          const rainChance = responses[currentCityIndex].data.clouds.all;
+          document.body.classList.toggle('rainy-theme', rainChance >= 70);
+        }
       } catch (error) {
         console.error('Error fetching the weather data', error);
       }
@@ -238,9 +269,11 @@ const App: React.FC = () => {
   }
 
   const currentWeather = weatherData[currentCityIndex];
+  const isRainy = currentWeather.clouds.all >= 70;
 
   return (
     <>
+      {isRainy && <RainEffect />}
       <div className="app-cloud-bg">
         <div className="app-cloud app-cloud-1"></div>
         <div className="app-cloud app-cloud-2"></div>

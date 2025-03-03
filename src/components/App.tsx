@@ -81,6 +81,33 @@ const RainEffect: React.FC = () => {
   );
 };
 
+const WindSigns: React.FC<{ windSpeed: number; windDegree: number }> = ({ windSpeed, windDegree }) => {
+  const windSigns = Array.from({ length: 20 }).map((_, i) => ({
+    id: i,
+    top: `${Math.random() * 100}%`,
+    animationDuration: `${Math.random() * 2 + 3}s`,
+    animationDelay: `${Math.random() * 2}s`,
+    transform: `rotate(${windDegree}deg)`
+  }));
+
+  return (
+    <div className="wind-signs">
+      {windSigns.map(sign => (
+        <div
+          key={sign.id}
+          className="wind-sign"
+          style={{
+            top: sign.top,
+            animationDuration: sign.animationDuration,
+            animationDelay: sign.animationDelay,
+            transform: sign.transform
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [weatherData, setWeatherData] = useState<any[]>([]);
   const [forecastData, setForecastData] = useState<ForecastData[]>([]);
@@ -270,10 +297,12 @@ const App: React.FC = () => {
 
   const currentWeather = weatherData[currentCityIndex];
   const isRainy = currentWeather.clouds.all >= 70;
+  const isWindy = currentWeather.wind.speed > 9;
 
   return (
     <>
       {isRainy && <RainEffect />}
+      {isWindy && <WindSigns windSpeed={currentWeather.wind.speed} windDegree={currentWeather.wind.deg} />}
       <div className="app-cloud-bg">
         <div className="app-cloud app-cloud-1"></div>
         <div className="app-cloud app-cloud-2"></div>
@@ -343,7 +372,6 @@ const App: React.FC = () => {
                 </div>
               </div>
               <div className="stat-value">{currentWeather.wind.speed}km/h</div>
-              <div className="stat-label">Wind speed</div>
             </div>
 
             <div className="stat-card">
@@ -362,13 +390,11 @@ const App: React.FC = () => {
                   {currentWeather.clouds.all}%
                 </text>
               </svg>
-              <div className="stat-label">Rain chance</div>
             </div>
 
             <div className="stat-card">
               <h3>Pressure</h3>
               <div className="stat-value">{currentWeather.main.pressure}hpa</div>
-              <div className="stat-label">Pressure</div>
             </div>
 
             <div className="stat-card">
@@ -387,7 +413,6 @@ const App: React.FC = () => {
                   {getUVIndexText(2)}
                 </text>
               </svg>
-              <div className="stat-label">UV index</div>
             </div>
           </div>
         </div>

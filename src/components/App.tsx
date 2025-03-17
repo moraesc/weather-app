@@ -216,6 +216,8 @@ const App: React.FC = () => {
   const [weatherData, setWeatherData] = useState<any[]>([]);
   const [forecastData, setForecastData] = useState<ForecastData[]>([]);
   const [currentCityIndex, setCurrentCityIndex] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY;
   const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
@@ -223,6 +225,15 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
+
+        if (!apiKey) {
+          setError('OpenWeather API key is missing. Please check your environment variables.');
+          setIsLoading(false);
+          return;
+        }
+
         // Fetch current weather
         const responses = await Promise.all(
           cities.map(city =>
@@ -255,8 +266,17 @@ const App: React.FC = () => {
           const rainChance = responses[currentCityIndex].data.clouds.all;
           document.body.classList.toggle('rainy-theme', rainChance >= 70);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching the weather data', error);
+        if (error.response?.status === 401) {
+          setError('Invalid API key. Please check your OpenWeather API key.');
+        } else if (error.response?.status === 404) {
+          setError('City not found. Please try again.');
+        } else {
+          setError('Failed to load weather data. Please try again later.');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -411,8 +431,35 @@ const App: React.FC = () => {
     return suggestions.join(" • ");
   };
 
+  if (error) {
+    return (
+      <div className="weather-container error-container">
+        <div className="error-message">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="error-icon">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()} className="retry-button">
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="weather-container loading-container">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <p>Loading weather data...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!weatherData.length) {
-    return <div className="weather-container"><p>Loading...</p></div>;
+    return null;
   }
 
   const currentWeather = weatherData[currentCityIndex];

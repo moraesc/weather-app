@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import '../App.css';
 
@@ -108,12 +108,117 @@ const WindSigns: React.FC<{ windSpeed: number; windDegree: number }> = ({ windSp
   );
 };
 
+interface MapProps {
+  city: string;
+  apiKey: string;
+}
+
+const Map: React.FC<MapProps> = ({ city, apiKey }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadMap = async () => {
+      try {
+        // Get city coordinates
+        const geocodeResponse = await axios.get(
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+            city
+          )}&key=${apiKey}`
+        );
+
+        if (geocodeResponse.data.results.length > 0) {
+          const { lat, lng } = geocodeResponse.data.results[0].geometry.location;
+          
+          // Load Google Maps
+          const google = (window as any).google;
+          const map = new google.maps.Map(mapRef.current, {
+            center: { lat, lng },
+            zoom: 12,
+            styles: [
+              {
+                featureType: 'water',
+                elementType: 'geometry',
+                stylers: [{ color: '#b0ddf7' }]
+              },
+              {
+                featureType: 'landscape',
+                elementType: 'geometry',
+                stylers: [{ color: '#f5f5f5' }]
+              }
+            ],
+            disableDefaultUI: true,
+            zoomControl: true
+          });
+
+          // Add marker
+          new google.maps.Marker({
+            position: { lat, lng },
+            map,
+            title: city
+          });
+
+          setMapLoaded(true);
+        }
+      } catch (error) {
+        console.error('Error loading map:', error);
+      }
+    };
+
+    if (!mapLoaded) {
+      loadMap();
+    }
+  }, [city, apiKey, mapLoaded]);
+
+  return <div ref={mapRef} className="map-container" />;
+};
+
+const PressureIndicator: React.FC<{ pressure: number }> = ({ pressure }) => {
+  const getPressureStatus = (pressure: number) => {
+    if (pressure > 1022) return 'high';
+    if (pressure < 1009) return 'low';
+    return 'normal';
+  };
+
+  const status = getPressureStatus(pressure);
+
+  // Create tick marks for the pressure gauge
+  const renderMarks = () => {
+    const marks = [];
+    for (let i = 0; i < 24; i++) {
+      const rotation = i * 15;
+      const isMajor = i % 3 === 0;
+      marks.push(
+        <div
+          key={i}
+          className={`pressure-mark ${isMajor ? 'major' : ''}`}
+          style={{ transform: `rotate(${rotation}deg)` }}
+        />
+      );
+    }
+    return marks;
+  };
+
+  return (
+    <div className="pressure-indicator">
+      <div className={`pressure-circle pressure-${status}`}>
+        <div className="pressure-marks">{renderMarks()}</div>
+        <div className={`pressure-arrow`} />
+        <span className="pressure-label high">High</span>
+        <span className="pressure-label normal">Normal</span>
+        <span className="pressure-label low">Low</span>
+      </div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [weatherData, setWeatherData] = useState<any[]>([]);
   const [forecastData, setForecastData] = useState<ForecastData[]>([]);
   const [currentCityIndex, setCurrentCityIndex] = useState(0);
 
   const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY;
+  const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   useEffect(() => {
     const fetchWeather = async () => {
@@ -157,6 +262,21 @@ const App: React.FC = () => {
 
     fetchWeather();
   }, [apiKey, currentCityIndex]);
+
+  useEffect(() => {
+    // Load Google Maps API
+    const loadGoogleMapsScript = () => {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    };
+
+    if (googleMapsApiKey) {
+      loadGoogleMapsScript();
+    }
+  }, [googleMapsApiKey]);
 
   const processForecastData = (forecastList: any[]): ForecastData[] => {
     const dailyForecasts: ForecastData[] = [];
@@ -394,6 +514,7 @@ const App: React.FC = () => {
 
             <div className="stat-card">
               <h3>Pressure</h3>
+              <PressureIndicator pressure={currentWeather.main.pressure} />
               <div className="stat-value">{currentWeather.main.pressure}hpa</div>
             </div>
 
